@@ -5,7 +5,6 @@ const app = express();
 var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var dns=require('dns');
-
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
@@ -48,20 +47,20 @@ app.use(bodyParser.urlencoded({extended:false}));
 var urls=mongoose.model('URL',urlSchema);
 
 var create_url=function(req,res){
-  var URL=new urls({url:req.body.url});
-  URL.save(function(err,data){
+  dns.lookup(req.body.url,function(err,addr){
+    if(err) res.json({"error":"invalid url"});
+    var URL=new urls({url:req.body.url});
+    URL.save(function(err,data){
     if(err) console.error(err);
     res.json({"original_url":data.url,"short_url":data.shorturl});
+  });
   });
 };
 
 var use_short=function(req,res){
   urls.findOne({shorturl:parseInt(req.params.code)},function(err,data){
     if(err) console.error(err);
-    dns.lookup(data.url,function(err,data2){
-      if(err) res.json({"error":"invalid url"});
-      res.redirect(data.url);
-    });
+    res.redirect(data.url);
   });
 };
 
