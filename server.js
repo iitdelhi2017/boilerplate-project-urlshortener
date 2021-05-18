@@ -48,7 +48,10 @@ var urls=mongoose.model('URL',urlSchema);
 
 var create_url=function(req,res){
   dns.lookup(req.body.url,function(err,addr){
-    if(err) res.json({"error":"invalid url"});
+    if(err) {
+      res.json({"error":"invalid url"});
+      return;
+    };
     var URL=new urls({url:req.body.url});
     URL.save(function(err,data){
     if(err) console.error(err);
