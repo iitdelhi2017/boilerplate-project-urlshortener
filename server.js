@@ -47,7 +47,10 @@ app.use(bodyParser.urlencoded({extended:false}));
 var urls=mongoose.model('URL',urlSchema);
 
 var create_url=function(req,res){
-  dns.lookup(req.body.url,function(err,addr){
+  var link="";
+  for(var i=7;i<req.body.url.length-1;i++)
+    link+=req.body.url[i];
+  dns.lookup(link,function(err,addr){
     if(err) {
       res.json({"error":"invalid url"});
       return;
