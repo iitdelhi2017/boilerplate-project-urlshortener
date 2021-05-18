@@ -37,7 +37,7 @@ var urlSchema=new mongoose.Schema({
   shorturl:{
     type:Number,
     default:function() {
-      return Math.floor(Math.random()*10000000000+Math.random()*10000000000); 
+      return Math.floor(Math.random()*100+Math.random()*10); 
     }
   }
 });
