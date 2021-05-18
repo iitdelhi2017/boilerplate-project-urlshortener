@@ -42,34 +42,43 @@ var urlSchema=new mongoose.Schema({
   }
 });
 
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({extended:true}));
 
 var urls=mongoose.model('URL',urlSchema);
 
 var create_url=function(req,res){
-  var link="",i=1;
-  while(req.body.url[i]!='/'){
-    i=i+1;
+  console.log(req.body.url);
+  var link="";
+  if(req.body.url.slice(0,8)!="https://" ){
+     res.json({"error":"invalid url"});
+      return;
   };
-  i=i+2;
-  for(;i<req.body.url.length-1;i++)
+  if(req.body.url.slice(8,12)!="www.")
+    link+="www."
+  for(var i=8;i<req.body.url.length-1;i++)
     link+=req.body.url[i];
-  dns.lookup(link,function(err,addr){
+  console.log(link);
+  /*dns.lookup(link,function(err,addr){
+    console.log(addr);
     if(err) {
       res.json({"error":"invalid url"});
       return;
-    };
+    };*/
     var URL=new urls({url:req.body.url});
     URL.save(function(err,data){
     if(err) console.error(err);
     res.json({"original_url":data.url,"short_url":data.shorturl});
   });
-  });
+ // });
 };
 
 var use_short=function(req,res){
+  if(isNaN(parseInt(req.params.code))){
+    res.json('Not found');return;
+  };
   urls.findOne({shorturl:parseInt(req.params.code)},function(err,data){
     if(err) console.error(err);
+    if(data==undefined) {res.json('NNo short URL found for the given input');return;}
     res.redirect(data.url);
   });
 };
